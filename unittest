@@ -1,0 +1,72 @@
+# test_inventario.py
+import unittest
+from main import Producto, Inventario
+
+class TestProducto(unittest.TestCase):
+    def test_crear_producto(self):
+        producto = Producto("Laptop", "Electrónica", 900.00, 5)
+        self.assertEqual(producto.get_nombre(), "Laptop")
+        self.assertEqual(producto.get_precio(), 900.00)
+
+    def test_precio_negativo(self):
+        with self.assertRaises(ValueError):
+            Producto("Producto", "Categoría", -10, 2)
+
+    def test_cantidad_negativa(self):
+        with self.assertRaises(ValueError):
+            Producto("Producto", "Categoría", 10, -2)
+
+    def test_to_dict(self):
+        producto = Producto("Laptop", "Electrónica", 900.00, 5)
+        data = producto.to_dict()
+        self.assertEqual(data['nombre'], 'Laptop')
+        self.assertEqual(data['precio'], 900.00)
+
+class TestInventario(unittest.TestCase):
+    def setUp(self):
+        self.inventario = Inventario()
+
+    def test_agregar_producto(self):
+        producto = Producto("Laptop", "Electrónica", 900.00, 5)
+        self.inventario.agregar_producto(producto)
+        self.assertEqual(len(self.inventario.__productos), 1)
+
+    def test_agregar_producto_duplicado(self):
+        producto = Producto("Laptop", "Electrónica", 900.00, 5)
+        self.inventario.agregar_producto(producto)
+        with self.assertRaises(ValueError):
+            self.inventario.agregar_producto(producto)
+
+    def test_actualizar_producto(self):
+        producto = Producto("Laptop", "Electrónica", 900.00, 5)
+        self.inventario.agregar_producto(producto)
+        self.inventario.actualizar_producto("Laptop", nuevo_precio=1000)
+        self.assertEqual(self.inventario.__productos[0].get_precio(), 1000)
+
+    def test_eliminar_producto(self):
+        producto = Producto("Laptop", "Electrónica", 900.00, 5)
+        self.inventario.agregar_producto(producto)
+        self.inventario.eliminar_producto("Laptop")
+        self.assertEqual(len(self.inventario.__productos), 0)
+
+    def test_buscar_producto(self):
+        producto = Producto("Laptop", "Electrónica", 900.00, 5)
+        self.inventario.agregar_producto(producto)
+        resultado = self.inventario.buscar_producto("Laptop")
+        self.assertIsNotNone(resultado)
+
+    def test_mostrar_inventario(self):
+        # Esta prueba es más compleja, ya que implica verificar la salida impresa. 
+        # Podrías utilizar un método de captura de salida para verificar el contenido.
+        # Por ahora, nos enfocaremos en verificar que no se produzcan errores.
+        self.inventario.mostrar_inventario()
+
+    # ... otras pruebas para la clase Inventario
+
+    def test_cargar_guardar_inventario(self):
+        # ... pruebas para cargar y guardar el inventario desde un archivo JSON
+
+    # ... otras pruebas para la clase Inventario
+
+if __name__ == '__main__':
+    unittest.main()
