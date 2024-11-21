@@ -21,20 +21,29 @@ def pausar():
 
 def signal_handler(sig, frame):
     limpiar_pantalla()
-    print('\nSaliendo del programa...')
+    print('Saliendo del programa...')
     exit(0)
+
+
+# Configuración del logging
+logging.basicConfig(level=logging.INFO,
+                    filename='inventario.log', 
+                    format='%(asctime)s - %(levelname)s - %(message)s'
+                    )
 
 
 signal.signal(signal.SIGINT, signal_handler)
 
 
-# Configuración del logging
-logging.basicConfig(level=logging.INFO, filename='inventario.log', 
-                    format='%(asctime)s - %(levelname)s - %(message)s')
-
-
 class Producto:
     def __init__(self, nombre, categoria, precio, cantidad):
+        if not nombre:
+            raise ValueError("El nombre no puede estar vacío")
+        if precio <= 0:
+            raise ValueError("El precio debe ser mayor que 0.")
+        if not isinstance(cantidad, int) or cantidad < 0:
+            raise ValueError("LA cantidad debe ser un número entero positivo o cero.Ñ")
+        
         self.__nombre = nombre
         self.__categoria = categoria
         self.__precio = precio
@@ -55,26 +64,12 @@ class Producto:
 
     # Setters
     def set_precio(self, precio):
-        # if precio <= 0:
-            # raise ValueError("El precio debe ser mayor que 0.")
         self.__precio = precio
 
     def set_cantidad(self, cantidad):
-        # if cantidad < 0:
-            # raise ValueError("La cantidad debe ser mayor o igual que 0.")
         self.__cantidad = cantidad
 
-    '''
-    def __str__(self):
-        return (
-            f"Nombre: {self.__nombre},\n"
-            f"Categoría: {self.__categoria},\n"
-            f"Precio: {self.__precio},\n"
-            f"Cantidad: {self.__cantidad},\n"
-        )
-
-    '''
-
+    # Creamos diccionario
     def to_dict(self):
         """Convierte el objeto a un diccionario para facilitar el uso con JSON."""
         return {
@@ -87,7 +82,10 @@ class Producto:
     @staticmethod
     def from_dict(data):
         """Crea un objeto Producto desde un diccionario."""
-        return Producto(data['nombre'], data['categoria'], data['precio'], data['cantidad'])
+        return Producto(data['nombre'],
+                        data['categoria'],
+                        data['precio'],
+                        data['cantidad'])
 
     def __str__(self):
         return f"Nombre: {self.__nombre}, Categoría: {self.__categoria}, Precio: {self.__precio}, Cantidad: {self.__cantidad}"
@@ -116,7 +114,7 @@ class Inventario:
         with open(self.archivo, 'w', encoding='utf-8') as f:
             json.dump([producto.to_dict() for producto in self.__productos], f, indent=4, ensure_ascii=False)
         logging.info("Inventario guardado en el archivo.")
-    
+
     def agregar_producto(self, producto):
         if any(p.get_nombre() == producto.get_nombre() for p in self.__productos):
             logging.warning("El producto ya existe en el inventario: %s", producto.get_nombre())
@@ -186,63 +184,72 @@ class Inventario:
         logging.warning("Producto no encontrado: %s", nombre)
         print("Producto no encontrado.")
 
+
 def mostrar_menu():
+    opciones = [
+        "Mostrar inventario completo",
+        "Buscar producto",
+        "Agregar producto",
+        "Actualizar producto",
+        "Eliminar producto",
+        "Salir"
+    ]
     print("Menú de opciones:")
-    print("1. Mostrar inventario completo")
-    print("2. Buscar producto")
-    print("3. Agregar producto")
-    print("4. Actualizar producto")
-    print("5. Eliminar producto")
-    print("6. Salir")
+    for i, opcion in enumerate(opciones, start=1):
+        print(f"{i}. {opcion}")
+
 
 def menu_principal():
+    inventario = Inventario()
     while True:
         limpiar_pantalla()
         mostrar_menu()
         opcion = input("Seleccione una opción: ")
-        
-        limpiar_pantalla()
-        if opcion == '1':
-            inventario.mostrar_inventario()
 
-        elif opcion == '2':
-            nombre = input("Ingrese el nombre del producto a buscar: ")
-            inventario.buscar_producto(nombre)
-        
-        elif opcion == '3':
-            nombre = input("Ingrese el nombre del producto: ")
-            categoria = input("Ingrese la categoría: ")
-            precio = float(input("Ingrese el precio: "))
-            cantidad = int(input("Ingrese la cantidad: "))
-            nuevo_producto = Producto(nombre, categoria, precio, cantidad)
-            inventario.agregar_producto(nuevo_producto)
-            # print("Producto agregado exitosamente.")
-        
-        elif opcion == '4':
-            nombre = input("Ingrese el nombre del producto a actualizar: ")
-            nuevo_precio = float(input("Ingrese el nuevo precio (deje en blanco si no desea cambiar): "))
-            nueva_cantidad = int(input("Ingrese la nueva cantidad (deje en blanco si no desea cambiar): "))
-            inventario.actualizar_producto(nombre, nuevo_precio, nueva_cantidad)
-        
-        elif opcion == '5':
-            nombre = input("Ingrese el nombre del producto a eliminar: ")
-            inventario.eliminar_producto(nombre)
-        
-        elif opcion == '6':
-            print("¡Hasta luego!")
-            break
-        
-        else:
-            print("Opción inválida. Intente nuevamente.")
-
-        pausar()
         limpiar_pantalla()
+        try:
+
+            if opcion == '1':
+                inventario.mostrar_inventario()
+    
+            elif opcion == '2':
+                nombre = input("Ingrese el nombre del producto a buscar: ")
+                inventario.buscar_producto(nombre)
+            
+            elif opcion == '3':
+                nombre = input("Ingrese el nombre del producto: ")
+                categoria = input("Ingrese la categoría: ")
+                precio = float(input("Ingrese el precio: "))
+                cantidad = int(input("Ingrese la cantidad: "))
+                nuevo_producto = Producto(nombre, categoria, precio, cantidad)
+                inventario.agregar_producto(nuevo_producto)
+                # print("Producto agregado exitosamente.")
+            
+            elif opcion == '4':
+                nombre = input("Ingrese el nombre del producto a actualizar: ")
+                nuevo_precio = float(input("Ingrese el nuevo precio (deje en blanco si no desea cambiar): "))
+                nueva_cantidad = int(input("Ingrese la nueva cantidad (deje en blanco si no desea cambiar): "))
+                inventario.actualizar_producto(nombre, nuevo_precio, nueva_cantidad)
+    
+            elif opcion == '5':
+                nombre = input("Ingrese el nombre del producto a eliminar: ")
+                inventario.eliminar_producto(nombre)
+    
+            elif opcion == '6':
+                print("¡Hasta luego!")
+                break
+            
+            else:
+                print("Opción inválida. Intente nuevamente.")
+    
+            pausar()
+            limpiar_pantalla()
+
+
+if __name__ == "__main__":
+    menu_principal()
 
 # Ejemplo de uso
-if __name__ == "__main__":
-    inventario = Inventario()
-    menu_principal()
-    
     '''
     # Crear algunos productos
     producto1 = Producto("Laptop", "Electrónica", 900.00, 5)
