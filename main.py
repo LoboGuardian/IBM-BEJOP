@@ -6,7 +6,7 @@ import json
 import logging
 
 # Configuración del logging
-logging.basicConfig(level=logging.INFO, filename='inventario.log', 
+logging.basicConfig(level=logging.INFO, filename='inventario.log',
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 

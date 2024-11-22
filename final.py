@@ -26,8 +26,7 @@ def signal_handler(sig, frame):
 
 
 # Configuración del logging
-logging.basicConfig(level=logging.INFO,
-                    filename='inventario.log', 
+logging.basicConfig(level=logging.INFO, filename='inventario.log',
                     format='%(asctime)s - %(levelname)s - %(message)s'
                     )
 
@@ -227,9 +226,13 @@ def menu_principal():
             
             elif opcion == '4':
                 nombre = input("Ingrese el nombre del producto a actualizar: ")
-                nuevo_precio = float(input("Ingrese el nuevo precio (deje en blanco si no desea cambiar): "))
-                nueva_cantidad = int(input("Ingrese la nueva cantidad (deje en blanco si no desea cambiar): "))
-                inventario.actualizar_producto(nombre, nuevo_precio, nueva_cantidad)
+                nuevo_precio = input("Ingrese el nuevo precio (deje en blanco si no desea cambiar): ")
+                nueva_cantidad = input("Ingrese la nueva cantidad (deje en blanco si no desea cambiar): ")
+                inventario.actualizar_producto(
+                    nombre,
+                    float(nuevo_precio) if nuevo_precio else None,
+                    int(nueva_cantidad) if nueva_cantidad else None
+                    )
     
             elif opcion == '5':
                 nombre = input("Ingrese el nombre del producto a eliminar: ")
@@ -238,12 +241,16 @@ def menu_principal():
             elif opcion == '6':
                 print("¡Hasta luego!")
                 break
-            
+
             else:
                 print("Opción inválida. Intente nuevamente.")
-    
-            pausar()
-            limpiar_pantalla()
+
+        except ValueError as e:
+            logging.error(e)
+            print(f"Error: {e}")
+
+        pausar()
+        limpiar_pantalla()
 
 
 if __name__ == "__main__":
@@ -310,25 +317,3 @@ if __name__ == "__main__":
     pausar()
     limpiar_pantalla()
     '''
-
-
-# Implementar exportacion a csv
-'''
-import csv
-
-def exportar_a_csv(self):
-    with open('inventario.csv', 'w', newline='') as csvfile:
-        fieldnames = ['Nombre', 'Categoría', 'Precio', 'Cantidad']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        for producto in self.__productos:
-            writer.writerow(producto.to_dict())
-'''
-
-# Añadir interfaz grafica
-# Tkinter o PyQt
-# O tal vez una web
-
-# Sustituir el json por SQLite o PostgreSQL
-
-# Evitar duplicados
