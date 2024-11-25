@@ -42,7 +42,7 @@ class Producto:
             raise ValueError("El precio debe ser mayor que 0.")
         if not isinstance(cantidad, int) or cantidad < 0:
             raise ValueError("LA cantidad debe ser un número entero positivo o cero.Ñ")
-        
+
         self.__nombre = nombre
         self.__categoria = categoria
         self.__precio = precio
@@ -132,7 +132,7 @@ class Inventario:
             # raise ValueError("La cantidad debe ser mayor o igual a 0.")
         if not isinstance(producto.get_cantidad(), int) or producto.get_cantidad() < 0:
             raise ValueError("La cantidad debe ser un número entero positivo o cero.")
-    
+
     def actualizar_producto(self, nombre, nuevo_precio=None, nueva_cantidad=None):
         for producto in self.__productos:
             if producto.get_nombre() == nombre:
@@ -146,7 +146,7 @@ class Inventario:
                 return
         logging.warning("Producto no encontrado para actualización: %s", nombre)
         print("Producto no encontrado.")
-    
+
     def eliminar_producto(self, nombre):
         for producto in self.__productos:
             if producto.get_nombre() == nombre:
@@ -157,7 +157,7 @@ class Inventario:
                 return
         logging.warning("Producto no encontrado para eliminación: %s", nombre)
         print("Producto no encontrado.")
-    
+
     def mostrar_inventario(self):
         if not self.__productos:
             print("El inventario está vacío.")
@@ -173,7 +173,7 @@ class Inventario:
                 print(producto)
                 return
         print(f"Producto '{nombre}' no encontrado.")
-    
+
     def buscar_producto(self, nombre):
         for producto in self.__productos:
             if producto.get_nombre() == nombre:
@@ -254,10 +254,10 @@ def menu_principal():
 
 
 if __name__ == "__main__":
-    menu_principal()
 
 # Ejemplo de uso
-    '''
+    inventario = Inventario()
+    # '''
     # Crear algunos productos
     producto1 = Producto("Laptop", "Electrónica", 900.00, 5)
     producto2 = Producto("Mouse", "Accesorios", 25.00, 15)
@@ -316,4 +316,7 @@ if __name__ == "__main__":
 
     pausar()
     limpiar_pantalla()
-    '''
+    # 
+    # 
+    menu_principal()
+    # '''
